@@ -5,6 +5,7 @@ import yaml
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.transforms as transforms
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
@@ -39,8 +40,67 @@ def main(config):
     # train
     train_dataset = datasets.make(config['train_dataset'],
                                   **config['train_dataset_args'])
+    augmentations = [
+        transforms.Compose([
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomRotation(35),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.RandomRotation(35),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomRotation(35),
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomRotation(35),
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+    ]
+    train_dataset.transform = augmentations[int(config['_a'])]
+    print(train_dataset.transform)
+    print("_a", config['_a'])
+    input("Continue with these augmentations?")
+
     train_loader = DataLoader(train_dataset, config['batch_size'], shuffle=True,
-                              num_workers=8, pin_memory=True)
+                              num_workers=0, pin_memory=True)
     utils.log('train dataset: {} (x{}), {}'.format(
             train_dataset[0][0].shape, len(train_dataset),
             train_dataset.n_classes))
@@ -53,7 +113,7 @@ def main(config):
         val_dataset = datasets.make(config['val_dataset'],
                                     **config['val_dataset_args'])
         val_loader = DataLoader(val_dataset, config['batch_size'],
-                                num_workers=8, pin_memory=True)
+                                num_workers=0, pin_memory=True)
         utils.log('val dataset: {} (x{}), {}'.format(
                 val_dataset[0][0].shape, len(val_dataset),
                 val_dataset.n_classes))
@@ -86,7 +146,7 @@ def main(config):
                     fs_dataset.label, 200,
                     n_way, n_shot + n_query, ep_per_batch=4)
             fs_loader = DataLoader(fs_dataset, batch_sampler=fs_sampler,
-                                   num_workers=8, pin_memory=True)
+                                   num_workers=0, pin_memory=True)
             fs_loaders.append(fs_loader)
     else:
         eval_fs = False
@@ -129,9 +189,10 @@ def main(config):
             if not config.get('epoch_ex'):
                 break
             train_dataset.transform = train_dataset.default_transform
+            print(train_dataset.transform)
             train_loader = DataLoader(
                     train_dataset, config['batch_size'], shuffle=True,
-                    num_workers=8, pin_memory=True)
+                    num_workers=0, pin_memory=True)
 
         timer_epoch.s()
         aves_keys = ['tl', 'ta', 'vl', 'va']
@@ -145,6 +206,7 @@ def main(config):
         writer.add_scalar('lr', optimizer.param_groups[0]['lr'], epoch)
 
         for data, label in tqdm(train_loader, desc='train', leave=False):
+        # for data, label in train_loader:
             data, label = data.cuda(), label.cuda()
             logits = model(data)
             loss = F.cross_entropy(logits, label)
@@ -268,12 +330,14 @@ if __name__ == '__main__':
     parser.add_argument('--name', default=None)
     parser.add_argument('--tag', default=None)
     parser.add_argument('--gpu', default='0')
+    parser.add_argument('--a', default=0)
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
     if len(args.gpu.split(',')) > 1:
         config['_parallel'] = True
         config['_gpu'] = args.gpu
+    config['_a'] = args.a
 
     utils.set_gpu(args.gpu)
     main(config)

@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.transforms as transforms
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
@@ -53,6 +54,66 @@ def main(config):
     # train
     train_dataset = datasets.make(config['train_dataset'],
                                   **config['train_dataset_args'])
+
+    augmentations = [
+        transforms.Compose([
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomRotation(35),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.RandomRotation(35),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomRotation(35),
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ]),
+        transforms.Compose([
+            transforms.RandomRotation(35),
+            transforms.RandomResizedCrop(size=(80, 80), scale=(0.08, 1.0), ratio=(0.75, 1.3333)),
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+    ]
+    train_dataset.transform = augmentations[int(config['_a'])]
+    print(train_dataset.transform)
+    print("_a", config['_a'])
+    input("Continue with these augmentations?")
+
     utils.log('train dataset: {} (x{}), {}'.format(
             train_dataset[0][0].shape, len(train_dataset),
             train_dataset.n_classes))
@@ -63,7 +124,7 @@ def main(config):
             n_train_way, n_train_shot + n_query,
             ep_per_batch=ep_per_batch)
     train_loader = DataLoader(train_dataset, batch_sampler=train_sampler,
-                              num_workers=8, pin_memory=True)
+                              num_workers=0, pin_memory=True)
 
     # tval
     if config.get('tval_dataset'):
@@ -79,7 +140,7 @@ def main(config):
                 n_way, n_shot + n_query,
                 ep_per_batch=4)
         tval_loader = DataLoader(tval_dataset, batch_sampler=tval_sampler,
-                                 num_workers=8, pin_memory=True)
+                                 num_workers=0, pin_memory=True)
     else:
         tval_loader = None
 
@@ -96,7 +157,7 @@ def main(config):
             n_way, n_shot + n_query,
             ep_per_batch=4)
     val_loader = DataLoader(val_dataset, batch_sampler=val_sampler,
-                            num_workers=8, pin_memory=True)
+                            num_workers=0, pin_memory=True)
 
     ########
 
@@ -261,12 +322,14 @@ if __name__ == '__main__':
     parser.add_argument('--name', default=None)
     parser.add_argument('--tag', default=None)
     parser.add_argument('--gpu', default='0')
+    parser.add_argument('--a', default=0)
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
     if len(args.gpu.split(',')) > 1:
         config['_parallel'] = True
         config['_gpu'] = args.gpu
+    config['_a'] = args.a
 
     utils.set_gpu(args.gpu)
     main(config)
