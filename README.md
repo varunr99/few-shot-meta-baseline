@@ -112,3 +112,19 @@ In configs for `train_meta.py`, both `tval_dataset` and `val_dataset` are valida
 ### Single-class AUC
 
 To evaluate the single-class AUC, add `--sauc` when running `test_few_shot.py`.
+
+### Augmentations
+By default, both the classifier-baseline and the meta-baseline are trained without data augmentation.
+To set different augmentations, add `--a <NUM>` when running `train_classifier.py` or `train_meta.py`.
+Belowing is a mapping of the numerical parameter to a set of data augmentations:
+
+| --a | Augmentations     |
+|-----|-------------------|
+| 0   | None              |
+| 1   | Cropping          |
+| 2   | Rotation          |
+| 3   | Jitter            |
+| 4   | Crop & Rotation   |
+| 5   | Crop & Jitter     |
+| 6   | Rotation & Jitter |
+| 7   | All               | 
