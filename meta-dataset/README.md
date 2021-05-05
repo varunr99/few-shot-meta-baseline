@@ -21,7 +21,7 @@ MSCOCO|55.7|53.1|43.6
 
 ### Running the code
 
-Follow the instructions in [this repo](https://github.com/google-research/meta-dataset) and put the data in `./materials/records` with dataset folders in it.
+Follow the instructions in [this repo](https://github.com/google-research/meta-dataset) and put the data in `./materials/records` with dataset folders in it. From the previous paper, we used the vgg_flower and mscoco datasets. All other data is taken as subsets from the original ImageNet data.
 
 Tensorflow 1.13 (CPU) is used for running data loader in `meta_dataset`.
 
@@ -48,4 +48,4 @@ Set `load_encoder`/`load` to the .pth file in `configs/test.yaml`, run
 ```
 python train_meta.py --config configs/test.yaml --name _ --dataset {DATASET_NAME} --gpu 0
 ```
-(Replace {DATASET_NAME} with one of: ilsvrc_2012, omniglot, aircraft, cu_birds, dtd, quickdraw, fungi, vgg_flower, traffic_sign, mscoco)
+(Replace {DATASET_NAME} with one of: ilsvrc_2012, mammals, dogs, vehicles, vgg_flower, mscoco, vegetables, kitchen)
