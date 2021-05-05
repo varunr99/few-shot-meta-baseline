@@ -1,6 +1,6 @@
-# Few-Shot Meta-Baseline
+# Few-Shot Meta-Baseline - CIS 620 Project 2
 
-This repository contains the code for [A New Meta-Baseline for Few-Shot Learning](https://arxiv.org/abs/2003.04390).
+This repository contains the code for [A New Meta-Baseline for Few-Shot Learning](https://arxiv.org/abs/2003.04390). This code is used by Varun Ramakrishnan and Shriyash Upadhyay for CIS 620 Project 2. The code used for Part 1, Data Augmentation, can be found in the "Master' branch. The code used for Part 2, New Data Classes, can be found in the "new-data" branch. 
 
 <img src="https://user-images.githubusercontent.com/10364424/76388735-bfb02580-63a4-11ea-8540-4021961a4fbe.png" width="600">
 
