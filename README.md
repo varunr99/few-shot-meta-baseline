@@ -97,6 +97,9 @@ Then run
 python test_few_shot.py --shot 1
 ```
 
+### Part 2 Specific Instructions
+All of the instructions/commands used to complete Part 2 can be found in the [README](https://github.com/varunr99/few-shot-meta-baseline/tree/master/meta-dataset) within the "meta-dataset" folder. The following smaller datasets must be downloaded from the linked repo: VGG Flower and MSCOCO.
+
 ## Advanced instructions
 
 ### Configs
@@ -116,7 +119,7 @@ In configs for `train_meta.py`, both `tval_dataset` and `val_dataset` are valida
 
 To evaluate the single-class AUC, add `--sauc` when running `test_few_shot.py`.
 
-### Augmentations
+### Augmentations (Part 1)
 By default, both the classifier-baseline and the meta-baseline are trained without data augmentation.
 To set different augmentations, add `--a <NUM>` when running `train_classifier.py` or `train_meta.py`.
 Belowing is a mapping of the numerical parameter to a set of data augmentations:
