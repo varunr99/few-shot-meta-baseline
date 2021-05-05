@@ -53,6 +53,9 @@ Experiments on Meta-Dataset are in [meta-dataset](https://github.com/cyvius96/fe
 
 ### Preliminaries
 
+**Pre-Built Model**
+One of the paper's pre-built models is used within Part 2 to evaluate the model with smaller, image datasets. This model can be found by clicking on the link [here](https://www.dropbox.com/sh/ef2sm8d8qadhg3a/AAAIBotzaCKIdN1dJTvgDk-wa?dl=0)), and then downloading "mini-resnet12.pth." The following instructions will explain how to run the model and test it. 
+
 **Environment**
 - Python 3.7.3
 - Pytorch 1.2.0
