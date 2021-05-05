@@ -39,8 +39,8 @@ def main(config):
             'batch', split='train', image_size=126, batch_size=256)
         return dataset
 
-    ds_names = ['ilsvrc_2012', 'omniglot', 'aircraft', 'cu_birds', 'dtd', \
-            'quickdraw', 'fungi', 'vgg_flower']
+    ds_names = ['ilsvrc_2012', 'mammals', 'dogs', 'vehicles', 'vgg_flower', 'mscoco', \
+    'vegetables', 'kitchen']
     datasets = []
     for name in ds_names:
         datasets.append(make_dataset(name))

@@ -33,8 +33,8 @@ def main(config):
     #### Dataset ####
 
     if args.dataset == 'all':
-        train_lst = ['ilsvrc_2012', 'omniglot', 'aircraft', 'cu_birds', 'dtd',
-                'quickdraw', 'fungi', 'vgg_flower']
+        train_lst = ['ilsvrc_2012', 'mammals', 'dogs', 'vehicles', 'vgg_flower', 'mscoco', \
+    'vegetables', 'kitchen']
         eval_lst = ['ilsvrc_2012']
     else:
         train_lst = [args.dataset]
